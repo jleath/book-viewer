@@ -7,12 +7,17 @@
 
 <% unless @search_query.nil? || @search_query.empty? %>
   <h2 class="content-subhead">Results for <%= @search_query %></h2>
-  <% if @matches.empty? %>
+  <% if @search_results.empty? %>
     <p>Sorry, no matches were found.</p>
   <% else %>
     <ul>
-      <% @matches.each do |match| %>
-        <li><a href="/chapters/<%= match[:number] %>"><%= match[:title] %></a></li>
+      <% @search_results.each do |match| %>
+        <li>
+          <h3><%= match[:title] %></h3>
+          <ul>
+            <%= matching_paragraphs(match) %>
+          </ul>
+        </li>
       <% end %>
     </ul>
   <% end %>

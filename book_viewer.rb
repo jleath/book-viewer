@@ -4,9 +4,20 @@ require "tilt/erubis"
 
 helpers do
   def in_paragraphs(content)
-    content.split("\n\n").each_with_index.map do |paragraph, index|
-      "<p id=paragraph#{index}>#{paragraph}</p>"
-    end.join
+    result = ''
+    each_paragraph(content) do |paragraph, index|
+      result += "<p id=paragraph#{index}>#{paragraph}</p>\n"
+    end
+    result
+  end
+
+  def matching_paragraphs(match)
+    result = ''
+    match[:matching_paragraphs].each do |match_data|
+      result += "<li><a href=\"chapters/#{match[:number]}#paragraph#{match_data[:index]}\">"
+      result += match_data[:content] + "</a></li>\n"
+    end
+    result
   end
 end
 
@@ -26,15 +37,26 @@ def each_chapter
   end
 end
 
+def each_paragraph(content)
+  content.split("\n\n").each_with_index do |paragraph, index|
+    yield paragraph, index
+  end
+end
+
 def chapters_matching(query)
-  matches = []
-  return matches if query.nil? || query.empty?
+  search_results = []
+  return search_results if query.nil? || query.empty?
 
   each_chapter do |number, title, contents|
-    matches << {number: number, title: title} if contents.include?(query)
+    matching_paragraphs = []
+    each_paragraph(contents) do |paragraph, index|
+      matching_paragraphs << {index: index, content: paragraph} if paragraph.include?(query)
+    end
+    unless matching_paragraphs.empty?
+      search_results << {number: number, title: title, matching_paragraphs: matching_paragraphs}
+    end
   end
-
-  matches
+  search_results
 end
 
 get "/" do
@@ -55,6 +77,6 @@ end
 get "/search" do
   @title = 'The Adventures of Sherlock Holmes'
   @search_query = params[:query]
-  @matches = chapters_matching(@search_query)
+  @search_results = chapters_matching(@search_query)
   erb :search
 end
