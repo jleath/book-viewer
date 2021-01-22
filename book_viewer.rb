@@ -13,9 +13,12 @@ helpers do
 
   def matching_paragraphs(match)
     result = ''
+    query = match[:query]
     match[:matching_paragraphs].each do |match_data|
-      result += "<li><a href=\"chapters/#{match[:number]}#paragraph#{match_data[:index]}\">"
-      result += match_data[:content] + "</a></li>\n"
+      paragraph_id = match_data[:index]
+      content = match_data[:content].gsub(query, "<strong>#{query}</strong>")
+      result += "<li><a href=\"chapters/#{match[:number]}#paragraph#{paragraph_id}\">"
+      result += content + "</a></li>\n"
     end
     result
   end
@@ -53,7 +56,9 @@ def chapters_matching(query)
       matching_paragraphs << {index: index, content: paragraph} if paragraph.include?(query)
     end
     unless matching_paragraphs.empty?
-      search_results << {number: number, title: title, matching_paragraphs: matching_paragraphs}
+      search_results << {number: number, title: title, 
+                         matching_paragraphs: matching_paragraphs,
+                         query: query}
     end
   end
   search_results

@@ -11,11 +11,11 @@
     <p>Sorry, no matches were found.</p>
   <% else %>
     <ul>
-      <% @search_results.each do |match| %>
+      <% @search_results.each do |chapter_match| %>
         <li>
-          <h3><%= match[:title] %></h3>
+          <h4><%= chapter_match[:title] %></h4>
           <ul>
-            <%= matching_paragraphs(match) %>
+            <%= matching_paragraphs(chapter_match) %>
           </ul>
         </li>
       <% end %>
